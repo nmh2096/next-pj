@@ -3,7 +3,14 @@ export interface INoteStore {
   message: string;
   success: boolean;
   noteList: INote[];
-  note: INote|null;
+  note: INote | null;
+}
+
+export interface INoteList {
+  id: string,
+  title: string,
+  content: string,
+  status: string,
 }
 
 export interface INote {

@@ -35,4 +35,16 @@ export const NoteListContainer = styled.div`
       }
     }
   }
+  .btn-add {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 0;
+    width: 70px;
+  height: 70px;
+  padding: 10px 16px;
+  border-radius: 35px;
+  font-size: 24px;
+  line-height: 1.33;
+  }
 `

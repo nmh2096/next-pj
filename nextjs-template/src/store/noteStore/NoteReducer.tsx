@@ -17,21 +17,24 @@ const NoteReducer = createSlice({
       state.loading = true;
     },
     getNoteListSuccess(state, action) {
-      state.loading = true;
-      state.message = action.payload;
+      state.loading = false;
+      state.noteList = action.payload.notes;
+      state.success = true;
     },
     getNoteListFail(state, action) {
-      state.loading = true;
+      state.loading = false;
       state.message = action.payload;
+      state.success = false;
+
     },
-    createRequest(state, _) {
+    createNoteListRequest(state, _) {
       state.loading = true;
     },
-    createSuccess(state, action) {
+    createNoteListSuccess(state, action) {
       state.loading = false;
       state.message = action.payload;
     },
-    createFail(state, action) {
+    createNoteListFail(state, action) {
       state.loading = false;
       state.message = action.payload;
     },

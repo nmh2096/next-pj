@@ -20,7 +20,7 @@ apiService.interceptors.request.use(
     } else if (authenCookie && authenCookie !== "") {
       token = authenCookie;
     }
-    config.headers.Authorizations = token;
+    config.headers.Authorization = token;
     return config;
   },
   (error) => Promise.reject(error)
