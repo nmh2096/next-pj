@@ -31,8 +31,11 @@ const NoteReducer = createSlice({
       state.loading = true;
     },
     createNoteListSuccess(state, action) {
+      console.log(state.noteList);
       state.loading = false;
-      state.noteList.push(action.payload);
+      state.success = true;
+      state.noteList.push(action.payload.notes);
+      
     },
     createNoteListFail(state, action) {
       state.loading = false;

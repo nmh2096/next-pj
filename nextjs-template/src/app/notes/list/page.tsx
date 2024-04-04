@@ -5,7 +5,7 @@ import { NoteAction } from '@/store/noteStore/NoteReducer';
 import { yupResolver } from '@hookform/resolvers/yup';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, TextField } from '@mui/material';
 import Button from '@mui/material/Button';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -27,6 +27,19 @@ export default function list() {
     status: "",
   };
 
+  const getStatusBadge = (status: any) => {
+    switch (status) {
+      case 'NORMAL':
+        return '#00c853'
+      case 'HIGHLIGHT':
+        return '#ffd600'
+      case 'IMPORTANT':
+        return '#f44336'
+    }
+  }
+
+  // const array = [1, 2, 3, 4, 5, 6]
+
   // const options: [
   //   { value: "IMPORTANT", text: "Important" },
   //   { value: "HIGHLIGHT", text: "Highlight" },
@@ -38,7 +51,7 @@ export default function list() {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<IList>({
+  } = useForm<INote>({
     resolver: yupResolver(schema),
     defaultValues: defaultList,
   });
@@ -48,7 +61,7 @@ export default function list() {
     handleSubmit: handleSubmitUpdate,
     reset: resetUpdate,
     formState: { errors: errorsUpdate },
-  } = useForm<IList>({
+  } = useForm<INote>({
     resolver: yupResolver(schema),
     defaultValues: defaultList,
   });
@@ -59,11 +72,9 @@ export default function list() {
 
   const createNewNote = () => {
     setUpdateModal(true);
-    console.log();
-    
   };
 
-  const handleSubmitNote = async (data: IList) => {
+  const handleSubmitNote = async (data: INote) => {
     console.log(data);
     dispatch(NoteAction.createNoteListRequest({
       ...data,
@@ -74,16 +85,21 @@ export default function list() {
   return (
     <NoteListContainer>
       {noteStore.noteList.map((item, index) => (
+      // {array.map((item, index) => (
         <div className="sigle-card" key={index}>
           <div className="header">
-            <span className='title' >Title</span>
+            <span className='title' >title</span>
             <div className="group-action">
               <CreateIcon className='pointer' style={{ color: "orange" }} />
               <DeleteIcon className='pointer' style={{ color: "red" }} />
             </div>
           </div>
           <div className="body">
-            <span className='badge' >TODO</span>
+            <span className='badge' >TODO
+              <MenuItem value="NORMAL">Normal</MenuItem>
+              <MenuItem value="IMPORTANT">Important</MenuItem>
+              <MenuItem value="HIGHLIGHT">Highlight</MenuItem>
+            </span>
             <span className='content' >Content</span>
           </div>
         </div>
@@ -134,7 +150,9 @@ export default function list() {
                 control={controlUpdate}
                 name="status"
                 render={({ field }) => (
-                  <TextField {...field} label="Status" size="small" />
+                  <TextField {...field} label="Status" size="small">
+
+                  </TextField>
                 )}
               />
               <small className="error">

@@ -1,4 +1,4 @@
-import { createApi, getNoteListApi } from "@/services/api/noteApi";
+import { createNoteListApi, getNoteListApi } from "@/services/api/noteApi";
 import { all, call, put, takeLatest } from "redux-saga/effects";
 import { NoteAction } from "./NoteReducer";
 
@@ -28,10 +28,12 @@ function* getNoteListWorker(): Generator {
 
 function* createNoteListWorker(action: any): Generator {
   try {
-    const response: any = yield call(createApi, action.payload)
+    const response: any = yield call(createNoteListApi, action.payload)
     if (response.status === 201) {
-      yield put(NoteAction.createNoteListSuccess(response.data.message))
       console.log(response)
+      console.log(action);
+      yield put(NoteAction.createNoteListSuccess(response.data.message))
+      
     }
   } catch (error: any) {
     yield put(NoteAction.createNoteListFail(error.response.data.message))
