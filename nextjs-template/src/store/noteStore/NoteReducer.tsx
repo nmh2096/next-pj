@@ -32,7 +32,7 @@ const NoteReducer = createSlice({
     },
     createNoteListSuccess(state, action) {
       state.loading = false;
-      state.message = action.payload;
+      state.noteList.push(action.payload);
     },
     createNoteListFail(state, action) {
       state.loading = false;

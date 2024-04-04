@@ -20,8 +20,8 @@ function* getNoteListWorker(): Generator {
       yield put (NoteAction.getNoteListSuccess(response.data));
     }
   } catch (error: any) {
-    yield put(NoteAction.getNoteListFail(error.response.data.message))
     console.log(error);
+    yield put(NoteAction.getNoteListFail(error.response.data.message))
 
   }
 };

@@ -6,14 +6,8 @@ export interface INoteStore {
   note: INote | null;
 }
 
-export interface INoteList {
-  id: string,
-  title: string,
-  content: string,
-  status: string,
-}
-
 export interface INote {
+  id?: string;
   title: string;
   content: string;
   status: string;

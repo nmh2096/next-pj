@@ -2,17 +2,17 @@
 
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { NoteAction } from '@/store/noteStore/NoteReducer';
+import { yupResolver } from '@hookform/resolvers/yup';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
 import Button from '@mui/material/Button';
 import { useEffect, useState } from 'react';
-import { NoteListContainer } from './style';
 import { Controller, useForm } from 'react-hook-form';
-import { Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
-import { yupResolver } from '@hookform/resolvers/yup';
+import { IList } from './interface';
 import { schema } from './schema';
-import { INote } from './interface';
-import { INoteList } from '@/store/noteStore/interface';
+import { NoteListContainer } from './style';
+import { INote } from '@/store/noteStore/interface';
 
 
 export default function list() {
@@ -21,6 +21,7 @@ export default function list() {
   const noteStore = useAppSelector((state) => state.note);
   const [updateModal, setUpdateModal] = useState(false);
   const defaultList = {
+    id: "",
     title: "",
     content: "",
     status: "",
@@ -37,7 +38,7 @@ export default function list() {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<INote>({
+  } = useForm<IList>({
     resolver: yupResolver(schema),
     defaultValues: defaultList,
   });
@@ -47,7 +48,7 @@ export default function list() {
     handleSubmit: handleSubmitUpdate,
     reset: resetUpdate,
     formState: { errors: errorsUpdate },
-  } = useForm<INote>({
+  } = useForm<IList>({
     resolver: yupResolver(schema),
     defaultValues: defaultList,
   });
@@ -58,11 +59,17 @@ export default function list() {
 
   const createNewNote = () => {
     setUpdateModal(true);
-
+    console.log();
+    
   };
 
-
-
+  const handleSubmitNote = async (data: IList) => {
+    console.log(data);
+    dispatch(NoteAction.createNoteListRequest({
+      ...data,
+    }));
+    reset();
+  };
 
   return (
     <NoteListContainer>
@@ -140,7 +147,7 @@ export default function list() {
           <Button color="error" onClick={() => setUpdateModal(false)}>
             Cancel
           </Button>
-          <Button>Update</Button>
+          <Button onClick={handleSubmit(handleSubmitNote)}>Submit</Button>
         </DialogActions>
       </Dialog>
     </NoteListContainer >
