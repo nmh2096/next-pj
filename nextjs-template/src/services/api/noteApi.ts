@@ -1,10 +1,15 @@
 import { apiService } from "..";
 
-export const getNoteListApi = async () =>  await apiService.get("/note/list");
-  
-export const createNoteListApi = async (body: any) =>
+export const getNoteListApi = async () => await apiService.get("/note/list");
+
+export const createApi = async (body: any) =>
   await apiService.post("/note/create", body);
-export const updateApi = async (body: any, id: string) =>
+
+export const getNoteDetailApi = async (_id: string) =>
+  await apiService.get(`/note/detail/${_id}`);
+
+export const updateNoteApi = async (id: string,body: any) =>
   await apiService.put(`/note/update/${id}`, body);
-export const deleteApi = async (id: string) =>
+
+export const deleteNoteApi = async (id: string) =>
   await apiService.delete(`/note/delete/${id}`);

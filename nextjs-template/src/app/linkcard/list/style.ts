@@ -1,7 +1,7 @@
 import { TextField } from "@mui/material";
 import styled from "styled-components";
 
-export const NoteListContainer = styled.div`
+export const LinkCardContainer = styled.div`
   padding: 20px;
   display: flex;
   flex-wrap: wrap;

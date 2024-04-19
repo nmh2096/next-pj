@@ -5,6 +5,7 @@ const initialState: IAuthStore = {
   loading: false,
   message: "",
   success: true,
+  profile: null,
 };
 
 const AuthReducer = createSlice({
@@ -35,6 +36,33 @@ const AuthReducer = createSlice({
     registerFail(state, action) {
       state.loading = false;
       state.message = action.payload;
+    },
+    getAuthRequest(state) {
+      state.loading = true;
+    },
+    getAuthSuccess(state, action) {
+      state.loading = false;
+      // state.message = action.payload;
+      state.profile = action.payload.user;
+      state.success = true;
+    },
+    getAuthFail(state, action) {
+      state.loading = false;
+      state.message = action.payload;
+      state.success = false;
+    },
+    getProfileRequest(state,_) {
+      state.loading = true;
+    },
+    getProfileSuccess(state, action) {
+      state.loading = false;
+      state.success = true;
+      state.profile = action.payload.profile;
+    },
+    getProfileFail(state, _) {
+      state.loading = false;
+      state.success = false;
+      state.profile = null;
     },
   },
 });

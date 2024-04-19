@@ -1,8 +1,8 @@
 "use client";
 
 import { useAppDispatch, useAppSelector } from '@/hooks';
-import { NoteAction } from '@/store/noteStore/NoteReducer';
-import { INote } from '@/store/noteStore/interface';
+import { CardAction } from '@/store/linkcardStore/LinkCardReducer';
+import { ICard } from '@/store/linkcardStore/interface';
 import { yupResolver } from '@hookform/resolvers/yup';
 import UpdateIcon from "@mui/icons-material/Create";
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -11,18 +11,20 @@ import Button from '@mui/material/Button';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { schema } from './schema';
-import { NoteListContainer } from './style';
+import { LinkCardContainer } from './style';
+import Link from 'next/link';
 
 export default function list() {
+
   const dispatch = useAppDispatch();
-  const noteStore = useAppSelector((state) => state.note);
+  const cardStore = useAppSelector((state) => state.card);
   const [openModal, setOpeneModal] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
-  const [deleteNoteModal, setDeleteNoteModal] = useState(false);
+  const [deleteCardModal, setDeleteCardModal] = useState(false);
   const defaultValues = {
     title: "",
-    content: "",
-    status: "NORMAL",
+    url: "",
+    status: "LEARNED",
   };
 
   const {
@@ -31,16 +33,22 @@ export default function list() {
     reset,
     formState: { errors },
     setValue,
-  } = useForm<INote>({
+  } = useForm<ICard>({
     resolver: yupResolver(schema),
     defaultValues,
   });
 
-  //* Get Note List/
+  useEffect(() => {
+    dispatch(CardAction.getCardListRequest())
+  }, []);
 
   useEffect(() => {
-    dispatch(NoteAction.getNoteListRequest());
-  }, []);
+    if(cardStore.card) {
+      setValue("title", cardStore.card.title)
+      setValue("url", cardStore.card.url)
+      setValue("status", cardStore.card.status)
+    }
+  }, [cardStore.card])
 
   const handleColoseModal = () => {
     reset();
@@ -48,60 +56,50 @@ export default function list() {
     setIsUpdate(false);
   };
 
-  //* Create Note List/
+  console.log();
 
-  const createNewNote = () => {
+
+  const handleUpdateModal = async (item: ICard) => {
+    dispatch(CardAction.getCardDetailRequest(item))
+    setIsUpdate(true);
+    setOpeneModal(true);
+    console.log(item);
+    
+  };
+
+  const handleDeleteModal = (item: ICard) => {
+
+  };
+
+  const createNewCard = () => {
     setIsUpdate(false);
     setOpeneModal(true);
   };
 
-  //* Handle submit Create and Update Note /
-
-  const handleSubmitNote = async (data: INote) => {
-    console.log(isUpdate);
+  const handleSubmitCard = (data: ICard) => {
     if (!isUpdate) {
-      dispatch(NoteAction.createNoteListRequest({
+      dispatch(CardAction.createCardListRequest({
         ...data,
       }));
       setIsUpdate(false);
     } else {
       console.log(data);
-      dispatch(NoteAction.updateNoteRequest({
+      dispatch(CardAction.updateCardRequest({
         ...data,
-        _id: noteStore.note?._id
+        _id: cardStore.card?._id
       }))
     }
     handleColoseModal();
   };
 
-  useEffect(() => {
-    if (noteStore.note) {
-      setValue("title", noteStore.note.title);
-      setValue("content", noteStore.note.content);
-      setValue("status", noteStore.note.status);
-    }
-  }, [noteStore.note])
+  const confirmDeleteCard = () => {
 
-  const handleUpdateModal = async (item: INote) => {
-    dispatch(NoteAction.getNoteDetailRequest(item));
-    setIsUpdate(true);
-    setOpeneModal(true);
-    console.log(item);
-  }
-
-  const handleDeleteModal = (item: INote) => {
-    dispatch(NoteAction.getNoteDetailRequest(item));
-    setDeleteNoteModal(true);
-  }
-
-  const confirmDeleteNote = () => {
-    dispatch(NoteAction.deleteNoteRequest(noteStore.note?._id));
-    setDeleteNoteModal(false);
-  }
+  };
 
   return (
-    <NoteListContainer>
-      {noteStore.noteList.map((item, index) => (
+    <LinkCardContainer>
+
+      {cardStore.cardList.map((item, index) => (
         <div className="sigle-card" key={index}>
           <div className="header">
             <span className='title' >{item.title}</span>
@@ -111,12 +109,12 @@ export default function list() {
             </div>
           </div>
           <div className="body">
-            <span className={`badge ${item.status == "IMPORTANT" ? "red-badge"
-              : item.status == "HIGHLIGHT" ? "yellow-badge"
+            <span className={`badge ${item.status == "TO LEARN" ? "red-badge"
+              : item.status == "LEARNING" ? "yellow-badge"
                 : "green-badge"}`} >
               {item.status}
             </span>
-            <span className='content' >{item.content}</span>
+            <Link className='url' href= {item.url} target='_blank' >{item.url}</Link>
           </div>
         </div>
       ))
@@ -124,11 +122,11 @@ export default function list() {
       <Button
         variant="contained"
         className='btn-add'
-        onClick={createNewNote}
+        onClick={createNewCard}
       >+</Button>
       <Dialog open={openModal} onClose={() => setOpeneModal(true)}>
         <DialogTitle id="alert-dialog-title">
-          {isUpdate ? "Update note" : "Create a new note"}
+          {isUpdate ? "Update card" : "Create a new card"}
         </DialogTitle>
         <DialogContent>
           <div
@@ -156,13 +154,13 @@ export default function list() {
             <div className="group-input">
               <Controller
                 control={control}
-                name="content"
+                name="url"
                 render={({ field }) => (
-                  <TextField {...field} label="Content" size="small" />
+                  <TextField {...field} label="Url" size="small" />
                 )}
               />
               <small className="error">
-                {errors.title && errors.content?.message}
+                {errors.title && errors.url?.message}
               </small>
             </div>
             <div className="group-input">
@@ -177,9 +175,9 @@ export default function list() {
                     size="small"
                     variant='outlined'
                   >
-                    <MenuItem value="NORMAL">Normal</MenuItem>
-                    <MenuItem value="IMPORTANT">Important</MenuItem>
-                    <MenuItem value="HIGHLIGHT">Highlight</MenuItem>
+                    <MenuItem value="TO LEARN">To Learn</MenuItem>
+                    <MenuItem value="LEARNING">Learning</MenuItem>
+                    <MenuItem value="LEARNED">Learned</MenuItem>
                   </Select>
                 )}
               />
@@ -193,34 +191,34 @@ export default function list() {
           <Button color="error" onClick={() => setOpeneModal(false)}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit(handleSubmitNote)}>
+          <Button onClick={handleSubmit(handleSubmitCard)}>
             {isUpdate ? "Update" : "Submit"}
           </Button>
         </DialogActions>
       </Dialog>
       <Dialog
-        open={deleteNoteModal}
-        onClose={() => setDeleteNoteModal(false)}
+        open={deleteCardModal}
+        onClose={() => setDeleteCardModal(false)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {"Delete Note"}
+          {"Delete Card"}
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete this note?
+            Are you sure you want to delete this card?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button color="error" onClick={() => setDeleteNoteModal(false)}>
+          <Button color="error" onClick={() => setDeleteCardModal(false)}>
             Cancel
           </Button>
-          <Button onClick={confirmDeleteNote}>
+          <Button onClick={confirmDeleteCard}>
             Delete
           </Button>
         </DialogActions>
       </Dialog>
-    </NoteListContainer >
+    </LinkCardContainer >
   )
 }
